@@ -1,6 +1,9 @@
 const express = require('express')
 const {engine} = require('express-handlebars')
-const pool = require('./db/conn')
+const conn = require('./db/conn')
+
+const User = require('./models/User')
+
 
 const app = express()
 
@@ -16,128 +19,34 @@ app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.use(express.static('public'))
 
+
+app.get('/users/create', (req, res) => {
+    res.render('adduser')
+})
+
+app.post('/users/create', async (req, res) => {
+
+    const name = req.body.name
+    const occupation = req.body.occupation
+    let newsletter = req.body.newsletter
+
+    if(newsletter === 'on'){
+        newsletter = true
+    }
+
+    console.log(req.body)
+
+    await User.create({name, occupation, newsletter})
+
+    res.redirect('/')
+})
+
 app.get('/', (req, res) => {
     res.render('home')
 })
 
-
-// adicionando dados 
-
-app.post('/books/insertbook', (req,res) =>{
-
-    const title = req.body.title
-    const pageqty = req.body.pageqty
-
-    const query = `INSERT INTO books (title, pageqty) VALUES('${title}', '${pageqty}')`
-
-    pool.query(query, function(err) {
-       if(err){
-        console.log(err)
-       }
-
-       res.redirect('/books')
-
-    })
-} )
-
-
-//resgatando dados
-
-app.get('/books', (req, res) => {
-    const query = "SELECT * FROM books"
-    pool.query(query, function(err, data){
-        if(err){
-            console.log(err)
-            return
-        }
-
-        const books = data
-        console.log(books)
-
-    res.render('books', {books})
-    })
-})
-
-// editando dados pt1
-
-app.get('/books/edit/:id', (req, res) => {
-
-    const id = req.params.id
-    const query = `SELECT * FROM books WHERE id = ${id}`
-    
-    pool.query(query, function (err, data) {
-        if (err){
-            console.log(err)
-            return
-        }
-
-        const book = data[0]
-
-        res.render('editbook', {book})
-
-    })
-
-})
-
-//filtrando dados com WHERE
-
-app.get('/books/:id', (req, res) => {
-    const id = req.params.id
-
-    const query = `SELECT * FROM books WHERE id = ${id}`
-
-    pool.query(query, function (err, data){
-        if(err){
-        console.log(err)
-        return
-        }
-
-        const book = data[0]
-
-        res.render('book', {book})
-    })
-})
-
-//editando livros pt2
-
-app.post('/books/updatebook', (req, res) => {
-
-    const id = req.body.id
-    const title = req.body.title
-    const pageqty = req.body.pageqty
-
-    const query = `UPDATE books SET title = '${title}', pageqty = '${pageqty}' WHERE id = '${id}'`
-
-    pool.query(query, function (err) {
-        if(err){
-            console.log(err)
-            return
-        }
-
-        res.redirect('/books')
-
-    })
-
-})
-
-//removendo
-
-app.post('/books/remove/:id', (req,res) => {
-    const id = req.params.id
-
-    const query = `DELETE FROM books WHERE id = ${id}`
-
-    pool.query(query, function(err) {
-        if(err){
-            console.log(err)
-            return
-        }
-
-        res.redirect('/books')
-
-    })
-})
-
-app.listen(3000)
-
-
+conn
+    .sync() 
+    .then(() => {
+    app.listen(3000)
+}).catch((err) => console.log(err))

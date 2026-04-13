@@ -22,8 +22,7 @@ h1{
     text-align: center;
 }
 
-.form, 
-.books-container {
+.form{
     width: 450px;
     margin: 0 auto;
 }
@@ -39,36 +38,16 @@ h1{
     margin-bottom: .3em;
 }
 
+.form-checkbox{
+    flex-direction: row;
+}
+
+.form-checkbox input{
+    margin-right: 10px;
+}
+
+
 .form-control input{
     padding:  5px;
 }
 
-
-.books-container div{
-    border-bottom: 1px solid #ccc;
-    padding: 5px;
-    margin: 5px;
-}
-
-.bold{
-    font-weight: bold;
-}
-
-#book-page{
-    padding: 2em;
-
-}
-
-#book-page .container{
-    text-align: center;
-}
-
-.actions{
-    margin-top: 1em;
-    display: flex;
-    justify-content: center;
-}
-
-.actions a{
-    margin-right: 1em;
-}
